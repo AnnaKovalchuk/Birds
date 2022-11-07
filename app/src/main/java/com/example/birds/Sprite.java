@@ -47,6 +47,9 @@ public class Sprite {
         this.padding = 20;
     }
 
+    public double getX() {
+        return x;
+    }
     public void setX(double x) {
         this.x = x;
     }
