@@ -14,6 +14,7 @@ import android.view.View;
 public class GameView extends View {
     public GameView(Context context) {
         super(context);
+        getLevel();
 
         //------------------------------Создание птицы, управляемой пользователем
 
@@ -22,7 +23,7 @@ public class GameView extends View {
         int w = b.getWidth()/5;
         int h = b.getHeight()/3;
         Rect firstFrame = new Rect(0, 0, w, h);
-        playerBird = new Sprite(10, 0, 0, 100, firstFrame, b);
+        playerBird = new Sprite(10, 0, 0, 200, firstFrame, b);
 
         //Добавим больше кадров с изображением птицы
         for (int i = 0; i < 3; i++) {
@@ -54,6 +55,42 @@ public class GameView extends View {
                 enemyBird.addFrame(new Rect(j*w, i*h, j*w+w, i*w+w));
             }
         }
+        enemyBird1 = new Sprite(2000, 250, -300, 0, firstFrame, b);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 4; j >= 0; j--) {
+                if (i ==0 && j == 4) {
+                    continue;
+                }
+                if (i ==2 && j == 0) {
+                    continue;
+                }
+                enemyBird1.addFrame(new Rect(j*w, i*h, j*w+w, i*w+w));
+            }
+        }
+        enemyBird2 = new Sprite(2000, 250, -300, 0, firstFrame, b);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 4; j >= 0; j--) {
+                if (i ==0 && j == 4) {
+                    continue;
+                }
+                if (i ==2 && j == 0) {
+                    continue;
+                }
+                enemyBird2.addFrame(new Rect(j*w, i*h, j*w+w, i*w+w));
+            }
+        }
+        enemyBird3 = new Sprite(2000, 250, -300, 0, firstFrame, b);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 4; j >= 0; j--) {
+                if (i ==0 && j == 4) {
+                    continue;
+                }
+                if (i ==2 && j == 0) {
+                    continue;
+                }
+                enemyBird3.addFrame(new Rect(j*w, i*h, j*w+w, i*w+w));
+            }
+        }
 
         //Создадим и запустим таймер
         Timer t = new Timer();
@@ -62,13 +99,19 @@ public class GameView extends View {
 
     private Sprite playerBird; //Птица игрока
     private Sprite enemyBird; //Птица противник
+    private Sprite enemyBird1;
+    private Sprite enemyBird2;
+    private Sprite enemyBird3;
 
     //Актуальные размеры игрового поля
     private int viewWidth;
     private int viewHeight;
 
     //Поле для хранения очкков, набранных игроком
-    private int points = 0;
+    private int points = 50;
+
+    //Уровень
+    private int level = 1;
 
     //--------------------------------Определение размеров игрового поля
     @Override
@@ -84,13 +127,25 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawARGB(250, 127, 199, 255); // цвет фона
-        playerBird.draw(canvas); //Нарисуем птицу игрока на экране
-        enemyBird.draw(canvas); //Нарисуем птицу противника на экране
         Paint p = new Paint();
         p.setAntiAlias(true);
         p.setTextSize(55.0f);
         p.setColor(Color.WHITE);
         canvas.drawText(points+"", viewWidth - 100, 70, p);
+        canvas.drawText(level+"", viewWidth - 160, 70, p);
+        playerBird.draw(canvas); //Нарисуем птицу игрока на экране
+        if(level == 1){
+            enemyBird.draw(canvas); //Нарисуем птицу противника на экране
+        }
+        else if(level ==2){
+            enemyBird1.draw(canvas);
+        }
+        else if(level == 3){
+            enemyBird2.draw(canvas);
+        }
+        else if(level == 4){
+            enemyBird3.draw(canvas);
+        }
     }
 
 
@@ -103,31 +158,93 @@ public class GameView extends View {
     protected void update () {
         playerBird.update(timerInterval);
         enemyBird.update(timerInterval); //Изменим состояние спрайта противника
+        enemyBird1.update(timerInterval);
+        enemyBird2.update(timerInterval);
+        enemyBird3.update(timerInterval);
         invalidate();
 
         //не позволит птице игрока вылететь за пределы экрана
         if (playerBird.getY() + playerBird.getFrameHeight() >  viewHeight) {
             playerBird.setY(viewHeight -   playerBird.getFrameHeight());
             playerBird.setVy(-playerBird.getVy());
-            points--;
         }
         else if (playerBird.getY() < 0) {
             playerBird.setY(0);
             playerBird.setVy(-playerBird.getVy());
-            points--;
         }
 
         //Возвращение птицы противника в начальное положение осуществляется после пролета игрока
         if (enemyBird.getX() < - enemyBird.getFrameWidth()) {
-            teleportEnemy ();
+            teleportEnemy (enemyBird);
             points +=10; //За облет птицы игроку начисляются очки
         }
-
         // Проверка столкновений
         if (enemyBird.intersect(playerBird)) {
-            teleportEnemy ();
-            points -= 40; //За столкновения с птицей у игрока снимаются очки.
+            teleportEnemy (enemyBird);
+            points -= 20; //За столкновения с птицей у игрока снимаются очки.
         }
+
+        if (enemyBird1.getX() < - enemyBird1.getFrameWidth()) {
+            teleportEnemy (enemyBird1);
+            points +=10; //За облет птицы игроку начисляются очки
+        }
+        // Проверка столкновений
+        if (enemyBird1.intersect(playerBird)) {
+            teleportEnemy (enemyBird1);
+            points -= 20; //За столкновения с птицей у игрока снимаются очки.
+        }
+
+        if (enemyBird2.getX() < - enemyBird2.getFrameWidth()) {
+            teleportEnemy (enemyBird2);
+            points +=10; //За облет птицы игроку начисляются очки
+        }
+        // Проверка столкновений
+        if (enemyBird2.intersect(playerBird)) {
+            teleportEnemy (enemyBird2);
+            points -= 20; //За столкновения с птицей у игрока снимаются очки.
+        }
+
+        if (enemyBird3.getX() < - enemyBird3.getFrameWidth()) {
+            teleportEnemy (enemyBird3);
+            points +=10; //За облет птицы игроку начисляются очки
+        }
+        // Проверка столкновений
+        if (enemyBird3.intersect(playerBird)) {
+            teleportEnemy (enemyBird3);
+            points -= 20; //За столкновения с птицей у игрока снимаются очки.
+        }
+    }
+
+    // метод возвращения птицы противника после пролета
+    private void teleportEnemy (Sprite enemy) {
+        enemy.setX(viewWidth + Math.random() * 500);
+        enemy.setY(Math.random() * (viewHeight - enemy.getFrameHeight()));
+    }
+
+        private void getLevel()
+        {
+            if (points < 80) {
+                level = 1;
+            }
+            else if (points <= 120) {
+                level = 2;
+            }
+            else if (points <= 230) {
+                level = 3;
+            }
+            else if (points <= 500) {
+                level = 4;
+            }
+        }
+
+    //-------------------------Управление птицей и контроль столкновений
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int eventAction = event.getAction();
+        if (eventAction == MotionEvent.ACTION_DOWN) {
+            playerBird.setVy(playerBird.getVy() *-1);
+        }
+        return true;
     }
 
     //Добавление класса таймера
@@ -145,31 +262,4 @@ public class GameView extends View {
         public void onFinish() {
         }
     }
-
-    //----------------------------------Управление птицей и контроль столкновений
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int eventAction = event.getAction();
-        if (eventAction == MotionEvent.ACTION_DOWN) {
-            // Движение вверх
-            if (event.getY() < playerBird.getBoundingBoxRect().top) {
-                playerBird.setVy(-100);
-                points--;
-            }
-            else if (event.getY() > (playerBird.getBoundingBoxRect().bottom)) {
-                playerBird.setVy(100);
-                points--;
-            }
-        }
-        return true;
     }
-
-    // метод возвращения птицы противника после пролета
-    private void teleportEnemy () {
-        enemyBird.setX(viewWidth + Math.random() * 500);
-        enemyBird.setY(Math.random() * (viewHeight - enemyBird.getFrameHeight()));
-    }
-
-
-}
-
